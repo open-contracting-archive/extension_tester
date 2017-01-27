@@ -48,13 +48,19 @@ def gather_data():
 
     for file_name in all_json:
         file_path = os.path.join(schema_dir, file_name)
-        all_json_path[file_name] = file_path
-        with open(file_path) as json_file:
-            try:
-                all_json_data[file_name] = json.load(json_file)
-            except json.decoder.JSONDecodeError:
-                # ignore for now as tests will catch this
-                all_json_data[file_name] = {}
+        try:
+            with open(file_path) as json_file:
+                all_json_path[file_name] = file_path
+                try:
+                    all_json_data[file_name] = json.load(json_file)
+                except json.decoder.JSONDecodeError:
+                    # ignore for now as tests will catch this
+                    all_json_data[file_name] = {}
+        except IOError:
+            if file_name == "extension.json":
+                raise Exception("extension.json not found. This directroy is not an extension or the extension.json file is missing")
+            print("Warning File {} not found in this extension".format(file_name))
+
 
 gather_data()
 
@@ -72,9 +78,10 @@ class TestExtensions(unittest.TestCase):
     def test_patches_apply(self):
         for key, schema in all_schema_data.items():
             new_schema = copy.deepcopy(schema)
-            new_schema = json_merge_patch.merge(new_schema, all_json_data[key])
-            if new_schema != schema:
-                print("{} has been patched".format(key))
+            if key in all_json_data:
+                new_schema = json_merge_patch.merge(new_schema, all_json_data[key])
+                if new_schema != schema:
+                    print("{} has been patched".format(key))
 
     def test_fakedata(self):
         self.assertTrue(validator(all_schema_data["release-package-schema.json"], format_checker=FormatChecker()).is_valid(fakedata))
