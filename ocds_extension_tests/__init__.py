@@ -9,10 +9,14 @@ import copy
 from jsonschema.validators import Draft4Validator as validator
 from jsonschema import FormatChecker
 
+TEST_CORE = os.environ.get('TEST_CORE')
+
 current_dir = os.path.dirname(os.path.realpath(__file__))
 all_json_path = {}
 all_json_data = {}
 all_schema_data = {}
+
+metaschema = requests.get('http://json-schema.org/schema').json()
 
 with open(os.path.join(current_dir, 'fixtures' ,"fullfakedata.json")) as fakedata_file:
     fakedata = json.load(fakedata_file)
@@ -53,13 +57,14 @@ def gather_data():
                 all_json_path[file_name] = file_path
                 try:
                     all_json_data[file_name] = json.load(json_file)
-                except json.decoder.JSONDecodeError:
+                except ValueError:
                     # ignore for now as tests will catch this
                     all_json_data[file_name] = {}
         except IOError:
-            if file_name == "extension.json":
+            if file_name == "extension.json" and not TEST_CORE:
                 raise Exception("extension.json not found. This directroy is not an extension or the extension.json file is missing")
-            print("Warning File {} not found in this extension".format(file_name))
+            if not TEST_CORE:
+                print("Warning File {} not found in this extension".format(file_name))
 
 
 gather_data()
@@ -72,16 +77,26 @@ class TestExtensions(unittest.TestCase):
             with open(json_file_name) as json_file:
                 try:
                     json.load(json_file)
-                except json.decoder.JSONDecodeError:
+                except ValueError:
                     raise Exception("File {} can does not appear to be valid JSON".format(file_name))
 
     def test_patches_apply(self):
         for key, schema in all_schema_data.items():
             new_schema = copy.deepcopy(schema)
-            if key in all_json_data:
-                new_schema = json_merge_patch.merge(new_schema, all_json_data[key])
-                if new_schema != schema:
-                    print("{} has been patched".format(key))
+            new_schema = json_merge_patch.merge(new_schema, all_json_data[key])
+            if new_schema != schema:
+                print("{} has been patched".format(key))
+
+    def test_metaschema(self):
+        for key, schema in all_schema_data.items():
+            new_schema = copy.deepcopy(schema)
+            if not validator(metaschema, format_checker=FormatChecker()).is_valid(all_json_data[key]):
+                raise Exception("File {} can does not appear valid json schema".format(key))
+
+            new_schema = json_merge_patch.merge(new_schema, all_json_data[key])
+            if not validator(metaschema, format_checker=FormatChecker()).is_valid(new_schema):
+                raise Exception("File {}, once patched, does not appear valid json schema".format(key))
+
 
     def test_fakedata(self):
         self.assertTrue(validator(all_schema_data["release-package-schema.json"], format_checker=FormatChecker()).is_valid(fakedata))
