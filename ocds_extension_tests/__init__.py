@@ -64,6 +64,7 @@ def gather_data():
             if file_name == "extension.json" and not TEST_CORE:
                 raise Exception("extension.json not found. This directroy is not an extension or the extension.json file is missing")
             if not TEST_CORE:
+                all_json_data[file_name] = {}
                 print("Warning File {} not found in this extension".format(file_name))
 
 
@@ -90,8 +91,6 @@ class TestExtensions(unittest.TestCase):
     def test_metaschema(self):
         for key, schema in all_schema_data.items():
             new_schema = copy.deepcopy(schema)
-            if not validator(metaschema, format_checker=FormatChecker()).is_valid(all_json_data[key]):
-                raise Exception("File {} can does not appear valid json schema".format(key))
 
             new_schema = json_merge_patch.merge(new_schema, all_json_data[key])
             if not validator(metaschema, format_checker=FormatChecker()).is_valid(new_schema):
