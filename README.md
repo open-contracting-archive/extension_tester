@@ -39,3 +39,6 @@ ocds_extension_tester.py
 This will run the tests on that extension.
 
 
+If you just want to test a full schema directory and not just an extension, not just an extension:
+
+TEST_CORE=1 ocds_extension_tester.py

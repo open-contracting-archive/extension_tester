@@ -64,8 +64,8 @@ def gather_data():
             if file_name == "extension.json" and not TEST_CORE:
                 raise Exception("extension.json not found. This directroy is not an extension or the extension.json file is missing")
             if not TEST_CORE:
-                all_json_data[file_name] = {}
                 print("Warning File {} not found in this extension".format(file_name))
+            all_json_data[file_name] = {}
 
 
 gather_data()

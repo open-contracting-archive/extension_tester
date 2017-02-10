@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='ocds-extension-tester',
-      version='0.5',
+      version='0.6',
       description='OCDS tool to test extensions',
       author='David Raznick',
       author_email='mr.raznick@gmail.com',
