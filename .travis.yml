@@ -6,5 +6,10 @@ python:
 install:
   - pip install -e .
 
-script:
-  - python test_registry.py
+jobs:
+  include:
+    - stage: test
+      script: python test_registry.py
+    - stage: test
+      install: pip install json_merge_patch requests -e git+https://github.com/OpenDataServices/flatten-tool.git@master#egg=flattentool
+      script: python extra/test_flattentool.py
