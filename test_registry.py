@@ -18,7 +18,9 @@ for entry in extensions:
         print('Error, we can\'t guess a git repo from entry url {}', entry['url'])
         exit_code = 1
         
-    subprocess.call(['git', 'clone', '-b', m.group(3), 'https://github.com/{}/{}.git'.format(m.group(1), m.group(2))])
+    if subprocess.call(['git', 'clone', '-b', m.group(3), 'https://github.com/{}/{}.git'.format(m.group(1), m.group(2))]):
+        exit_code = 1
     os.chdir(m.group(2))
-    subprocess.call(['ocds_extension_tester.py'])
+    if subprocess.call(['ocds_extension_tester.py']):
+        exit_code = 1
 exit(exit_code)
