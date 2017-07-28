@@ -11,7 +11,7 @@ release_schema = requests.get('http://standard.open-contracting.org/schema/1__1_
 os.makedirs('extended_schemas', exist_ok=True)
 
 with open('ocds-213czf-000-00001-01-planning.json', 'w') as fp:
-    fp.write(requests.get('https://raw.githubusercontent.com/open-contracting/sample-data/master/fictional-example/ocds-213czf-000-00001-01-planning.json').text)
+    fp.write(requests.get('https://raw.githubusercontent.com/open-contracting/sample-data/master/fictional-example/1.1/ocds-213czf-000-00001-01-planning.json').text)
 
 
 def try_flattentool(schema_path):
