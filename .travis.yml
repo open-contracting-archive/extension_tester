@@ -13,3 +13,10 @@ jobs:
     - stage: test
       install: pip install json_merge_patch requests -e git+https://github.com/OpenDataServices/flatten-tool.git@master#egg=flattentool
       script: python extra/test_flattentool.py
+
+notifications:
+  email:
+    recipients:
+      - code@opendataservices.coop
+    on_success: never # default: change
+    on_failure: always # default: always
