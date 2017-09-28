@@ -1,11 +1,15 @@
+sudo: false
 language: python
-
+cache: pip
 python:
-  - "3.5"
-
+  - "3.6"
+env:
+  - BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
 install:
+  - curl -s -S $BASEDIR/tests/install.sh | bash -
   - pip install -e .
-
+script:
+  - curl -s -S $BASEDIR/tests/script.sh | bash -
 jobs:
   include:
     - stage: test
@@ -13,7 +17,6 @@ jobs:
     - stage: test
       install: pip install json_merge_patch requests -e git+https://github.com/OpenDataServices/flatten-tool.git@master#egg=flattentool
       script: python extra/test_flattentool.py
-
 notifications:
   email:
     recipients:

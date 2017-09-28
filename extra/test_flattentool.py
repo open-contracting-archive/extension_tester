@@ -11,7 +11,8 @@ release_schema = requests.get('http://standard.open-contracting.org/schema/1__1_
 os.makedirs('extended_schemas', exist_ok=True)
 
 with open('ocds-213czf-000-00001-01-planning.json', 'w') as fp:
-    fp.write(requests.get('https://raw.githubusercontent.com/open-contracting/sample-data/master/fictional-example/1.1/ocds-213czf-000-00001-01-planning.json').text)
+    url = 'https://raw.githubusercontent.com/open-contracting/sample-data/master/fictional-example/1.1/ocds-213czf-000-00001-01-planning.json'  # noqa
+    fp.write(requests.get(url).text)
 
 
 def try_flattentool(schema_path):
@@ -34,17 +35,19 @@ def try_flattentool(schema_path):
         schema=schema_path
     )
 
+
 # Run once with the base 1.1 schema, so its clear which warnings are from that
 try_flattentool('http://standard.open-contracting.org/schema/1__1__0/release-schema.json')
 
-extensions_list = requests.get('http://standard.open-contracting.org/extension_registry/master/extensions.json').json()['extensions']
-extensions_dict = {e['slug']:e for e in extensions_list}
+extensions_list = requests.get(
+    'http://standard.open-contracting.org/extension_registry/master/extensions.json').json()['extensions']
+extensions_dict = {e['slug']: e for e in extensions_list}
 
 for extension in extensions_list:
     extended_schema = copy.deepcopy(release_schema)
 
     def do_patch(extension):
-        release_schema_patch = requests.get(extension['url']+'release-schema.json').json()
+        release_schema_patch = requests.get(extension['url'] + 'release-schema.json').json()
         json_merge_patch.merge(extended_schema, release_schema_patch)
 
     if extension['slug'] == 'bids':
@@ -53,7 +56,7 @@ for extension in extensions_list:
         do_patch(extensions_dict['metrics'])
     do_patch(extension)
 
-    schema_path = os.path.join('extended_schemas', extension['slug']+'.json')
+    schema_path = os.path.join('extended_schemas', extension['slug'] + '.json')
     with open(schema_path, 'w') as fp:
         json.dump(extended_schema, fp, indent=4)
 

@@ -16,4 +16,4 @@ setup(name='ocds-extension-tester',
       packages=['ocds_extension_tests'],
       license='BSD',
       url='https://github.com/open-contracting/extension-tester'
-)
+      )
