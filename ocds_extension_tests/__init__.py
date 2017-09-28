@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import unittest
-import os 
+import os
 import json
 import requests
 import json_merge_patch
@@ -18,8 +18,9 @@ all_schema_data = {}
 
 metaschema = requests.get('http://json-schema.org/schema').json()
 
-with open(os.path.join(current_dir, 'fixtures' ,"fullfakedata.json")) as fakedata_file:
+with open(os.path.join(current_dir, 'fixtures', "fullfakedata.json")) as fakedata_file:
     fakedata = json.load(fakedata_file)
+
 
 def gather_data():
 
@@ -38,17 +39,15 @@ def gather_data():
     all_versions.sort()
     latest_version = "__".join(all_versions[-1])
 
-
-    all_json = ["release-package-schema.json", "release-schema.json", 
-                "record-package-schema.json", "versioned-release-validation-schema.json", 
+    all_json = ["release-package-schema.json", "release-schema.json",
+                "record-package-schema.json", "versioned-release-validation-schema.json",
                 "extension.json"]
 
     for file_name in all_json:
         if file_name == "extension.json":
             continue
-        all_schema_data[file_name] = requests.get('http://standard.open-contracting.org/schema/' + latest_version + '/' + file_name).json()
-
-
+        all_schema_data[file_name] = requests.get(
+            'http://standard.open-contracting.org/schema/' + latest_version + '/' + file_name).json()
 
     for file_name in all_json:
         file_path = os.path.join(schema_dir, file_name)
@@ -62,7 +61,8 @@ def gather_data():
                     all_json_data[file_name] = {}
         except IOError:
             if file_name == "extension.json" and not TEST_CORE:
-                raise Exception("extension.json not found. This directroy is not an extension or the extension.json file is missing")
+                raise Exception(
+                    "extension.json not found. This directroy is not an extension or the extension.json file is missing")
             if not TEST_CORE:
                 print("Warning File {} not found in this extension".format(file_name))
             all_json_data[file_name] = {}
@@ -96,10 +96,10 @@ class TestExtensions(unittest.TestCase):
             if not validator(metaschema, format_checker=FormatChecker()).is_valid(new_schema):
                 raise Exception("File {}, once patched, does not appear valid json schema".format(key))
 
-
     def test_fakedata(self):
-        self.assertTrue(validator(all_schema_data["release-package-schema.json"], format_checker=FormatChecker()).is_valid(fakedata))
-        
+        self.assertTrue(validator(all_schema_data["release-package-schema.json"],
+                                  format_checker=FormatChecker()).is_valid(fakedata))
+
 
 def run_tests():
     unittest.main()

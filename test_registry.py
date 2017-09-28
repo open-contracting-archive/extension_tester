@@ -5,7 +5,8 @@ import os
 
 exit_code = 0
 
-extensions = requests.get('http://standard.open-contracting.org/extension_registry/master/extensions.json').json()['extensions']
+extensions = requests.get(
+    'http://standard.open-contracting.org/extension_registry/master/extensions.json').json()['extensions']
 
 os.makedirs('extensions', exist_ok=True)
 os.chdir('extensions')
@@ -17,7 +18,7 @@ for entry in extensions:
     if not m:
         print('Error, we can\'t guess a git repo from entry url {}', entry['url'])
         exit_code = 1
-        
+
     if subprocess.call(['git', 'clone', '-b', m.group(3), 'https://github.com/{}/{}.git'.format(m.group(1), m.group(2))]):
         exit_code = 1
     os.chdir(m.group(2))
