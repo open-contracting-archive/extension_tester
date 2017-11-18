@@ -24,6 +24,7 @@ for entry in extensions:
         if subprocess.call(['git', 'clone', '-b', m.group(3), repo]):
             exit_code = 1
     os.chdir(m.group(2))
+    print(m.group(2))
     if subprocess.call(['ocds_extension_tester.py']):
         exit_code = 1
 exit(exit_code)
