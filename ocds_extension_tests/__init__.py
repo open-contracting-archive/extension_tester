@@ -88,7 +88,6 @@ class TestExtensions(unittest.TestCase):
         for key, schema in all_schema_data.items():
             if key in all_json_data:
                 new_schema = copy.deepcopy(schema)
-
                 new_schema = json_merge_patch.merge(new_schema, all_json_data[key])
                 if not validator(metaschema, format_checker=FormatChecker()).is_valid(new_schema):
                     raise Exception("File {}, once patched, does not appear valid json schema".format(key))
