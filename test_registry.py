@@ -20,8 +20,9 @@ for entry in extensions:
         exit_code = 1
 
     repo = 'https://github.com/{}/{}.git'.format(m.group(1), m.group(2))
-    if subprocess.call(['git', 'clone', '-b', m.group(3), repo]):
-        exit_code = 1
+    if not os.path.exists(m.group(2)):
+        if subprocess.call(['git', 'clone', '-b', m.group(3), repo]):
+            exit_code = 1
     os.chdir(m.group(2))
     if subprocess.call(['ocds_extension_tester.py']):
         exit_code = 1
